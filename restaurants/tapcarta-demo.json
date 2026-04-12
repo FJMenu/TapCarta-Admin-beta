@@ -13,8 +13,31 @@
     "googleReviews": true,
     "whatsapp": true
   },
-  "menu": {
-    "categories": []
+   "menu": {
+    "categories": [
+      {
+        "id": "entrees",
+        "name": "Entrées",
+        "order": 1,
+        "items": [
+          {
+            "id": "croquettes-fromage",
+            "name": "Croquettes de fromage",
+            "subtitle": "Servies chaudes et croustillantes",
+            "price": 12.5,
+            "visible": true
+          },
+          {
+            "id": "camembert-frit",
+            "name": "Camembert frit",
+            "subtitle": "Panure dorée, cœur fondant",
+            "price": 12.5,
+            "visible": true
+          }
+        ]
+      }
+    ]
+  },
   },
   "billing": {
     "planPrice": 30,
