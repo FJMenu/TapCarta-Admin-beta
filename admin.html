@@ -314,19 +314,39 @@ function renderMenuCategories(menu) {
     </div>
   </div>
 
-  <div class="flex flex-col items-end gap-2 flex-shrink-0 ml-3">
-    <div class="text-xs text-gold">
-      ${(category.items || []).length} plat(s)
-    </div>
+<div class="flex flex-col items-end gap-2 flex-shrink-0 ml-3">
+  <div class="text-xs text-gold">
+    ${(category.items || []).length} plat(s)
+  </div>
+
+  <div class="flex items-center gap-2">
     <button
       type="button"
-      data-action="add-item"
+      data-action="move-category-up"
       data-category-index="${index}"
-      class="rounded-lg border border-gold/25 bg-gold/10 px-3 py-2 text-xs font-semibold text-gold"
+      class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
     >
-      + Plat
+      ↑
+    </button>
+    <button
+      type="button"
+      data-action="move-category-down"
+      data-category-index="${index}"
+      class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
+    >
+      ↓
     </button>
   </div>
+
+  <button
+    type="button"
+    data-action="add-item"
+    data-category-index="${index}"
+    class="rounded-lg border border-gold/25 bg-gold/10 px-3 py-2 text-xs font-semibold text-gold"
+  >
+    + Plat
+  </button>
+</div>
 </div>
 
         <div class="text-xs text-gold flex-shrink-0 ml-3">
@@ -478,6 +498,24 @@ function moveItem(categoryIndex, itemIndex, direction) {
   if (targetIndex < 0 || targetIndex >= items.length) return;
 
   [items[itemIndex], items[targetIndex]] = [items[targetIndex], items[itemIndex]];
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function moveCategory(categoryIndex, direction) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories) return;
+
+  const categories = currentRestaurantData.menu.categories;
+  const targetIndex = direction === 'up' ? categoryIndex - 1 : categoryIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= categories.length) return;
+
+  [categories[categoryIndex], categories[targetIndex]] = [categories[targetIndex], categories[categoryIndex]];
+
+  categories.forEach((category, index) => {
+    category.order = index + 1;
+  });
+
   renderMenuCategories(currentRestaurantData.menu);
 }
 
@@ -695,15 +733,33 @@ document.getElementById('menu-categories-list').addEventListener('click', (e) =>
     return;
   }
 
-  const moveDownButton = e.target.closest('[data-action="move-item-down"]');
-  if (moveDownButton) {
-    const categoryIndex = Number(moveDownButton.dataset.categoryIndex);
-    const itemIndex = Number(moveDownButton.dataset.itemIndex);
+ const moveDownButton = e.target.closest('[data-action="move-item-down"]');
+if (moveDownButton) {
+  const categoryIndex = Number(moveDownButton.dataset.categoryIndex);
+  const itemIndex = Number(moveDownButton.dataset.itemIndex);
 
-    if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
 
-    moveItem(categoryIndex, itemIndex, 'down');
-  }
+  moveItem(categoryIndex, itemIndex, 'down');
+  return;
+}
+
+const moveCategoryUpButton = e.target.closest('[data-action="move-category-up"]');
+if (moveCategoryUpButton) {
+  const categoryIndex = Number(moveCategoryUpButton.dataset.categoryIndex);
+  if (Number.isNaN(categoryIndex)) return;
+
+  moveCategory(categoryIndex, 'up');
+  return;
+}
+
+const moveCategoryDownButton = e.target.closest('[data-action="move-category-down"]');
+if (moveCategoryDownButton) {
+  const categoryIndex = Number(moveCategoryDownButton.dataset.categoryIndex);
+  if (Number.isNaN(categoryIndex)) return;
+
+  moveCategory(categoryIndex, 'down');
+}
 });
 
 document.getElementById('add-category-btn').addEventListener('click', () => {
