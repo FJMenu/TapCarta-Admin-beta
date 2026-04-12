@@ -6,7 +6,7 @@
 <title>TapCarta Admin</title>
 
 <script>
-  const APP_VERSION = '1.0.5';
+  const APP_VERSION = '1.0.6';
 </script>
 
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -337,8 +337,8 @@ function renderMenuCategories(menu) {
   Prix
 </label>
 <input
-  type="number"
-  step="0.01"
+  type="text"
+  inputmode="decimal"
   value="${typeof item.price === 'number' ? item.price : ''}"
   data-category-index="${index}"
   data-item-index="${itemIndex}"
@@ -346,8 +346,6 @@ function renderMenuCategories(menu) {
   class="w-24 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gold text-right outline-none"
 >
 <div class="text-[11px] mt-2 ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
-  ${item.visible ? 'Visible' : 'Masqué'}
-</div>
               </div>
             </div>
           </div>
@@ -520,8 +518,46 @@ if (e.target.dataset.field === 'item-price') {
     if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
     if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
 
-    currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].name = e.target.value;
+currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].name = e.target.value;
+    return;
   }
+
+  if (e.target.dataset.field === 'item-subtitle') {
+    const categoryIndex = Number(e.target.dataset.categoryIndex);
+    const itemIndex = Number(e.target.dataset.itemIndex);
+
+    if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+    if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
+
+    currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].subtitle = e.target.value;
+    return;
+  }
+
+  if (e.target.dataset.field === 'item-price') {
+    const categoryIndex = Number(e.target.dataset.categoryIndex);
+    const itemIndex = Number(e.target.dataset.itemIndex);
+
+    if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+    if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
+
+    const parsedPrice = parseFloat(e.target.value);
+    currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].price = Number.isNaN(parsedPrice) ? 0 : parsedPrice;
+    return;
+  }
+});
+
+document.getElementById('menu-categories-list').addEventListener('change', (e) => {
+  if (!currentRestaurantData) return;
+  if (e.target.dataset.field !== 'item-visible') return;
+
+  const categoryIndex = Number(e.target.dataset.categoryIndex);
+  const itemIndex = Number(e.target.dataset.itemIndex);
+
+  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
+
+  currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].visible = e.target.checked;
+  renderMenuCategories(currentRestaurantData.menu);
 });
 }
 
