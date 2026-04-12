@@ -346,6 +346,16 @@ function applyEditMode() {
     addCategoryButton.disabled = !editMode;
   }
 
+  document.querySelectorAll('#menu-categories-list input').forEach((input) => {
+    input.disabled = !editMode;
+    input.readOnly = !editMode;
+  });
+
+  document.querySelectorAll('#menu-categories-list button').forEach((button) => {
+    button.disabled = !editMode;
+  });
+}
+
   document.querySelectorAll('#menu-categories-list input, #menu-categories-list button').forEach((element) => {
     element.disabled = !editMode;
   });
