@@ -412,26 +412,35 @@ function renderMenuCategories(menu) {
     >
   </label>
 
-  <div class="flex items-center gap-2">
-    <button
-      type="button"
-      data-action="move-item-up"
-      data-category-index="${index}"
-      data-item-index="${itemIndex}"
-      class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
-    >
-      ↑
-    </button>
-    <button
-      type="button"
-      data-action="move-item-down"
-      data-category-index="${index}"
-      data-item-index="${itemIndex}"
-      class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
-    >
-      ↓
-    </button>
-  </div>
+ <div class="flex items-center gap-2">
+  <button
+    type="button"
+    data-action="move-item-up"
+    data-category-index="${index}"
+    data-item-index="${itemIndex}"
+    class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
+  >
+    ↑
+  </button>
+  <button
+    type="button"
+    data-action="move-item-down"
+    data-category-index="${index}"
+    data-item-index="${itemIndex}"
+    class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
+  >
+    ↓
+  </button>
+  <button
+    type="button"
+    data-action="delete-item"
+    data-category-index="${index}"
+    data-item-index="${itemIndex}"
+    class="rounded-lg border border-red-400/20 bg-red-500/10 px-2 py-1 text-[11px] text-red-300"
+  >
+    ×
+  </button>
+</div>
 </div>
 </div>
             </div>
@@ -516,6 +525,14 @@ function moveCategory(categoryIndex, direction) {
     category.order = index + 1;
   });
 
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function deleteItem(categoryIndex, itemIndex) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
+
+  currentRestaurantData.menu.categories[categoryIndex].items.splice(itemIndex, 1);
   renderMenuCategories(currentRestaurantData.menu);
 }
 
@@ -759,6 +776,17 @@ if (moveCategoryDownButton) {
   if (Number.isNaN(categoryIndex)) return;
 
   moveCategory(categoryIndex, 'down');
+  return;
+}
+
+const deleteItemButton = e.target.closest('[data-action="delete-item"]');
+if (deleteItemButton) {
+  const categoryIndex = Number(deleteItemButton.dataset.categoryIndex);
+  const itemIndex = Number(deleteItemButton.dataset.itemIndex);
+
+  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+
+  deleteItem(categoryIndex, itemIndex);
 }
 });
 
