@@ -6,7 +6,7 @@
 <title>TapCarta Admin</title>
 
 <script>
-  const APP_VERSION = '2';
+  const APP_VERSION = '1.0.3';
 </script>
 
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -209,6 +209,26 @@
               </div>
             </div>
           </article>
+</section>
+
+        <section class="mt-6">
+          <article class="rounded-[24px] border border-gold/18 bg-gradient-to-br from-white/[0.04] to-white/[0.015] p-5 md:p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-2xl bg-gold/12 border border-gold/25 flex items-center justify-center">
+                <i data-lucide="utensils-crossed" class="w-5 h-5 text-gold"></i>
+              </div>
+              <div>
+                <h3 class="font-display text-lg font-bold text-cream">Menu</h3>
+                <p class="text-xs text-cream/60 mt-1">Catégories actuellement chargées</p>
+              </div>
+            </div>
+
+            <div id="menu-categories-list" class="space-y-3">
+              <div class="rounded-xl border border-white/8 bg-black/15 px-4 py-3 text-sm text-cream/55">
+                Aucune catégorie chargée.
+              </div>
+            </div>
+          </article>
         </section>
       </main>
     </div>
@@ -223,23 +243,55 @@
       return `${value} € / mois`;
     }
 
-    function renderModules(modules) {
-      const container = document.getElementById('modules-list');
-      const labels = {
-        web: 'Web',
-        ordering: 'Commande',
-        booking: 'Réservation',
-        googleReviews: 'Google Reviews',
-        whatsapp: 'WhatsApp'
-      };
+function renderModules(modules) {
+  const container = document.getElementById('modules-list');
+  const labels = {
+    web: 'Web',
+    ordering: 'Commande',
+    booking: 'Réservation',
+    googleReviews: 'Google Reviews',
+    whatsapp: 'WhatsApp'
+  };
 
-      container.innerHTML = Object.entries(modules).map(([key, value]) => `
-        <label class="flex items-center justify-between rounded-xl border border-white/8 bg-black/15 px-4 py-3">
-          <span class="text-sm text-cream">${labels[key] || key}</span>
-          <input type="checkbox" data-module="${key}" ${value ? 'checked' : ''} class="w-4 h-4 accent-yellow-400">
-        </label>
-      `).join('');
-    }
+  container.innerHTML = Object.entries(modules).map(([key, value]) => `
+    <label class="flex items-center justify-between rounded-xl border border-white/8 bg-black/15 px-4 py-3">
+      <span class="text-sm text-cream">${labels[key] || key}</span>
+      <input type="checkbox" data-module="${key}" ${value ? 'checked' : ''} class="w-4 h-4 accent-yellow-400">
+    </label>
+  `).join('');
+}
+
+function renderMenuCategories(menu) {
+  const container = document.getElementById('menu-categories-list');
+  if (!container) return;
+
+  const categories = menu?.categories || [];
+
+  if (!categories.length) {
+    container.innerHTML = `
+      <div class="rounded-xl border border-white/8 bg-black/15 px-4 py-3 text-sm text-cream/55">
+        Aucune catégorie chargée.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = categories.map((category, index) => `
+    <div class="rounded-xl border border-white/8 bg-black/15 px-4 py-4">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <div class="text-sm font-semibold text-cream">${category.name || `Catégorie ${index + 1}`}</div>
+          <div class="text-xs text-cream/55 mt-1">
+            ID : ${category.id || '—'} · Ordre : ${typeof category.order === 'number' ? category.order : index + 1}
+          </div>
+        </div>
+        <div class="text-xs text-gold">
+          ${(category.items || []).length} plat(s)
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
 
        function recalculateBilling() {
       if (!currentRestaurantData) return;
@@ -272,7 +324,8 @@
       document.getElementById('field-plan').value = data.identity.plan || 'standard';
       document.getElementById('field-languages').value = (data.identity.languages || []).join(', ');
 
-      renderModules(data.modules);
+        renderModules(data.modules);
+      renderMenuCategories(data.menu);
       recalculateBilling();
 
       document.getElementById('billing-plan-price').textContent = formatPrice(data.billing.planPrice || 0);
@@ -305,7 +358,7 @@ function downloadCurrentRestaurantJson() {
     clearTimeout(window.tapCartaSaveStatusTimeout);
     window.tapCartaSaveStatusTimeout = setTimeout(() => {
       saveStatus.classList.add('hidden');
-    }, 2500);
+    }, 4000);
   }
 }
 function bindFormEvents() {
