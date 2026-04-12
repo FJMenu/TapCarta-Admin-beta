@@ -6,7 +6,7 @@
 <title>TapCarta Admin</title>
 
 <script>
-  const APP_VERSION = '1.0.7';
+  const APP_VERSION = '1.0.8';
 </script>
 
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -436,10 +436,10 @@ function renderMenuCategories(menu) {
     data-action="delete-item"
     data-category-index="${index}"
     data-item-index="${itemIndex}"
-    class="rounded-lg border border-red-400/20 bg-red-500/10 px-2 py-1 text-[11px] text-red-300"
-  >
-    ×
-  </button>
+   class="rounded-lg border border-red-400/30 bg-red-500/12 px-3 py-1.5 text-sm font-bold text-red-300"
+ >
+  <i data-lucide="trash-2" class="w-4 h-4"></i>
+</button>
 </div>
 </div>
 </div>
