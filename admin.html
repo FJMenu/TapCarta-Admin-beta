@@ -332,21 +332,31 @@ function renderMenuCategories(menu) {
 >
               </div>
 
-              <div class="text-right flex-shrink-0">
-            <label class="block text-[11px] uppercase tracking-wide text-cream/45 mb-2 text-right">
-  Prix
-</label>
-<input
-  type="text"
-  inputmode="decimal"
-  value="${typeof item.price === 'number' ? item.price : ''}"
-  data-category-index="${index}"
-  data-item-index="${itemIndex}"
-  data-field="item-price"
-  class="w-24 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gold text-right outline-none"
->
-<div class="text-[11px] mt-2 ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
-              </div>
+    <div class="text-right flex-shrink-0">
+  <label class="block text-[11px] uppercase tracking-wide text-cream/45 mb-2 text-right">
+    Prix
+  </label>
+  <input
+    type="text"
+    inputmode="decimal"
+    value="${typeof item.price === 'number' ? item.price : ''}"
+    data-category-index="${index}"
+    data-item-index="${itemIndex}"
+    data-field="item-price"
+    class="w-24 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gold text-right outline-none"
+  >
+  <label class="mt-2 inline-flex items-center justify-end gap-2 text-[11px] ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
+    <span>${item.visible ? 'Visible' : 'Masqué'}</span>
+    <input
+      type="checkbox"
+      ${item.visible ? 'checked' : ''}
+      data-category-index="${index}"
+      data-item-index="${itemIndex}"
+      data-field="item-visible"
+      class="w-4 h-4 accent-yellow-400"
+    >
+  </label>
+</div>
             </div>
           </div>
         `).join('') : `
@@ -478,38 +488,14 @@ function bindFormEvents() {
 document.getElementById('menu-categories-list').addEventListener('input', (e) => {
   if (!currentRestaurantData) return;
 
- if (e.target.dataset.field === 'item-name') {
-  const categoryIndex = Number(e.target.dataset.categoryIndex);
-  const itemIndex = Number(e.target.dataset.itemIndex);
+  if (e.target.dataset.field === 'category-name') {
+    const categoryIndex = Number(e.target.dataset.categoryIndex);
+    if (Number.isNaN(categoryIndex)) return;
+    if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
 
-  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
-  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
-
-  currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].name = e.target.value;
-  return;
-}
-
-if (e.target.dataset.field === 'item-subtitle') {
-  const categoryIndex = Number(e.target.dataset.categoryIndex);
-  const itemIndex = Number(e.target.dataset.itemIndex);
-
-  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
-  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
-
-  currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].subtitle = e.target.value;
-  return;
-}
-
-if (e.target.dataset.field === 'item-price') {
-  const categoryIndex = Number(e.target.dataset.categoryIndex);
-  const itemIndex = Number(e.target.dataset.itemIndex);
-
-  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
-  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
-
-  const parsedPrice = parseFloat(e.target.value);
-  currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].price = Number.isNaN(parsedPrice) ? 0 : parsedPrice;
-}
+    currentRestaurantData.menu.categories[categoryIndex].name = e.target.value;
+    return;
+  }
 
   if (e.target.dataset.field === 'item-name') {
     const categoryIndex = Number(e.target.dataset.categoryIndex);
@@ -518,7 +504,7 @@ if (e.target.dataset.field === 'item-price') {
     if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
     if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
 
-currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].name = e.target.value;
+    currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].name = e.target.value;
     return;
   }
 
