@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TapCarta Admin</title>
+<title>TapCarta Admin</title>
 
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  const APP_VERSION = '2';
+</script>
+
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,9 +88,9 @@
       <main class="p-5 md:p-8">
 <header class="mb-8 flex flex-col gap-4">
   <div class="flex flex-wrap items-center gap-2">
-    <span class="inline-flex items-center rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
-      V1.0.1
-    </span>
+<span class="inline-flex items-center rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
+  <script>document.write(APP_VERSION);</script>
+</span>
     <span class="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-cream/70">
       beta interne
     </span>
@@ -104,7 +108,7 @@
       <button class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
         Aperçu
       </button>
-      <button class="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm font-semibold text-gold">
+      <button id="save-json-btn" class="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm font-semibold text-gold">
         Enregistrer
       </button>
     </div>
@@ -274,51 +278,70 @@
 
       if (window.lucide) lucide.createIcons();
     }
+    function downloadCurrentRestaurantJson() {
+      if (!currentRestaurantData || !currentRestaurantId) return;
 
-    function bindFormEvents() {
-      document.getElementById('field-name').addEventListener('input', (e) => {
-        if (!currentRestaurantData) return;
-        currentRestaurantData.identity.name = e.target.value;
-      });
+      const jsonString = JSON.stringify(currentRestaurantData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
 
-      document.getElementById('field-status').addEventListener('change', (e) => {
-        if (!currentRestaurantData) return;
-        currentRestaurantData.identity.status = e.target.value;
-      });
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${currentRestaurantId}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-      document.getElementById('field-plan').addEventListener('change', (e) => {
-        if (!currentRestaurantData) return;
-        currentRestaurantData.identity.plan = e.target.value;
-        fillForm(currentRestaurantData);
-      });
-
-      document.getElementById('field-languages').addEventListener('input', (e) => {
-        if (!currentRestaurantData) return;
-
-        currentRestaurantData.identity.languages = e.target.value
-          .split(',')
-          .map(item => item.trim())
-          .filter(Boolean);
-
-        recalculateBilling();
-        document.getElementById('billing-options-price').textContent =
-          `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
-        document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
-      });
-
-      document.getElementById('modules-list').addEventListener('change', (e) => {
-        if (!currentRestaurantData) return;
-        if (!e.target.matches('input[type="checkbox"][data-module]')) return;
-
-        const moduleKey = e.target.dataset.module;
-        currentRestaurantData.modules[moduleKey] = e.target.checked;
-
-        recalculateBilling();
-        document.getElementById('billing-options-price').textContent =
-          `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
-        document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
-      });
+      URL.revokeObjectURL(url);
     }
+function bindFormEvents() {
+  document.getElementById('field-name').addEventListener('input', (e) => {
+    if (!currentRestaurantData) return;
+    currentRestaurantData.identity.name = e.target.value;
+  });
+
+  document.getElementById('field-status').addEventListener('change', (e) => {
+    if (!currentRestaurantData) return;
+    currentRestaurantData.identity.status = e.target.value;
+  });
+
+  document.getElementById('field-plan').addEventListener('change', (e) => {
+    if (!currentRestaurantData) return;
+    currentRestaurantData.identity.plan = e.target.value;
+    fillForm(currentRestaurantData);
+  });
+
+  document.getElementById('field-languages').addEventListener('input', (e) => {
+    if (!currentRestaurantData) return;
+
+    currentRestaurantData.identity.languages = e.target.value
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean);
+
+    recalculateBilling();
+    document.getElementById('billing-options-price').textContent =
+      `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
+    document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
+  });
+
+  document.getElementById('modules-list').addEventListener('change', (e) => {
+    if (!currentRestaurantData) return;
+    if (!e.target.matches('input[type="checkbox"][data-module]')) return;
+
+    const moduleKey = e.target.dataset.module;
+    currentRestaurantData.modules[moduleKey] = e.target.checked;
+
+    recalculateBilling();
+    document.getElementById('billing-options-price').textContent =
+      `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
+    document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
+  });
+
+  document.getElementById('save-json-btn').addEventListener('click', () => {
+    downloadCurrentRestaurantJson();
+  });
+}
 
     async function loadRestaurantData(id) {
       const response = await fetch(`./restaurants/${id}.json`);
