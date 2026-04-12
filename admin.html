@@ -118,6 +118,13 @@
       <button class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
         Aperçu
       </button>
+      <button
+        id="edit-mode-btn"
+        type="button"
+        class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-cream/80"
+      >
+        Modifier
+      </button>
       <div class="flex items-center gap-3">
         <button id="save-json-btn" class="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm font-semibold text-gold">
           Enregistrer
@@ -277,6 +284,7 @@
 let currentRestaurantData = null;
 let undoStack = [];
 let activeUndoSource = null;
+let editMode = false;
 
     function formatPrice(value) {
       return `${value} € / mois`;
@@ -300,6 +308,20 @@ function pushUndoSnapshot(sourceKey, force = false) {
 
 function resetUndoSource() {
   activeUndoSource = null;
+}
+
+function updateEditModeButton() {
+  const button = document.getElementById('edit-mode-btn');
+  if (!button) return;
+
+  if (editMode) {
+    button.className = 'rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm font-semibold text-gold';
+    button.textContent = 'Modification activée';
+    return;
+  }
+
+  button.className = 'rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-cream/80';
+  button.textContent = 'Modifier';
 }
 
 function undoLastChange() {
@@ -974,6 +996,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   bindFormEvents();
   bindUndoTracking();
 
+  document.getElementById('edit-mode-btn').addEventListener('click', () => {
+    editMode = !editMode;
+    updateEditModeButton();
+  });
+
   document.getElementById('undo-btn-top').addEventListener('click', () => {
     undoLastChange();
   });
@@ -981,6 +1008,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('undo-btn-bottom').addEventListener('click', () => {
     undoLastChange();
   });
+
+  updateEditModeButton();
 
   if (window.lucide) lucide.createIcons();
 });
