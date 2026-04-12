@@ -279,13 +279,23 @@ function renderMenuCategories(menu) {
   container.innerHTML = categories.map((category, index) => `
     <div class="rounded-xl border border-white/8 bg-black/15 px-4 py-4">
       <div class="flex items-center justify-between gap-3">
-        <div>
-          <div class="text-sm font-semibold text-cream">${category.name || `Catégorie ${index + 1}`}</div>
-          <div class="text-xs text-cream/55 mt-1">
+        <div class="min-w-0 flex-1">
+          <label class="block text-[11px] uppercase tracking-wide text-cream/45 mb-2">
+            Nom de catégorie
+          </label>
+          <input
+            type="text"
+            value="${category.name || ''}"
+            data-category-index="${index}"
+            data-field="category-name"
+            class="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-cream outline-none"
+          >
+          <div class="text-xs text-cream/55 mt-2">
             ID : ${category.id || '—'} · Ordre : ${typeof category.order === 'number' ? category.order : index + 1}
           </div>
         </div>
-        <div class="text-xs text-gold">
+
+        <div class="text-xs text-gold flex-shrink-0 ml-3">
           ${(category.items || []).length} plat(s)
         </div>
       </div>
@@ -440,9 +450,20 @@ function bindFormEvents() {
     document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
   });
 
-  document.getElementById('save-json-btn').addEventListener('click', () => {
-    downloadCurrentRestaurantJson();
-  });
+ document.getElementById('save-json-btn').addEventListener('click', () => {
+  downloadCurrentRestaurantJson();
+});
+
+document.getElementById('menu-categories-list').addEventListener('input', (e) => {
+  if (!currentRestaurantData) return;
+  if (e.target.dataset.field !== 'category-name') return;
+
+  const categoryIndex = Number(e.target.dataset.categoryIndex);
+  if (Number.isNaN(categoryIndex)) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
+
+  currentRestaurantData.menu.categories[categoryIndex].name = e.target.value;
+});
 }
 
     async function loadRestaurantData(id) {
