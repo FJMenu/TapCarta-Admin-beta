@@ -319,20 +319,35 @@ function renderMenuCategories(menu) {
 <div class="text-xs text-cream/55 mt-2">
   ID : ${item.id || '—'}
 </div>
-                ${item.subtitle ? `
-                  <div class="text-xs text-cream/65 mt-2">
-                    ${item.subtitle}
-                  </div>
-                ` : ''}
+    <label class="block text-[11px] uppercase tracking-wide text-cream/45 mt-3 mb-2">
+  Sous-titre
+</label>
+<input
+  type="text"
+  value="${item.subtitle || ''}"
+  data-category-index="${index}"
+  data-item-index="${itemIndex}"
+  data-field="item-subtitle"
+  class="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-cream outline-none"
+>
               </div>
 
               <div class="text-right flex-shrink-0">
-                <div class="text-sm font-semibold text-gold">
-                  ${typeof item.price === 'number' ? `${item.price.toFixed(2)} €` : '—'}
-                </div>
-                <div class="text-[11px] mt-1 ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
-                  ${item.visible ? 'Visible' : 'Masqué'}
-                </div>
+            <label class="block text-[11px] uppercase tracking-wide text-cream/45 mb-2 text-right">
+  Prix
+</label>
+<input
+  type="number"
+  step="0.01"
+  value="${typeof item.price === 'number' ? item.price : ''}"
+  data-category-index="${index}"
+  data-item-index="${itemIndex}"
+  data-field="item-price"
+  class="w-24 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gold text-right outline-none"
+>
+<div class="text-[11px] mt-2 ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
+  ${item.visible ? 'Visible' : 'Masqué'}
+</div>
               </div>
             </div>
           </div>
@@ -465,14 +480,38 @@ function bindFormEvents() {
 document.getElementById('menu-categories-list').addEventListener('input', (e) => {
   if (!currentRestaurantData) return;
 
-  if (e.target.dataset.field === 'category-name') {
-    const categoryIndex = Number(e.target.dataset.categoryIndex);
-    if (Number.isNaN(categoryIndex)) return;
-    if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
+ if (e.target.dataset.field === 'item-name') {
+  const categoryIndex = Number(e.target.dataset.categoryIndex);
+  const itemIndex = Number(e.target.dataset.itemIndex);
 
-    currentRestaurantData.menu.categories[categoryIndex].name = e.target.value;
-    return;
-  }
+  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
+
+  currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].name = e.target.value;
+  return;
+}
+
+if (e.target.dataset.field === 'item-subtitle') {
+  const categoryIndex = Number(e.target.dataset.categoryIndex);
+  const itemIndex = Number(e.target.dataset.itemIndex);
+
+  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
+
+  currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].subtitle = e.target.value;
+  return;
+}
+
+if (e.target.dataset.field === 'item-price') {
+  const categoryIndex = Number(e.target.dataset.categoryIndex);
+  const itemIndex = Number(e.target.dataset.itemIndex);
+
+  if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
+
+  const parsedPrice = parseFloat(e.target.value);
+  currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].price = Number.isNaN(parsedPrice) ? 0 : parsedPrice;
+}
 
   if (e.target.dataset.field === 'item-name') {
     const categoryIndex = Number(e.target.dataset.categoryIndex);
