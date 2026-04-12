@@ -6,7 +6,7 @@
 <title>TapCarta Admin</title>
 
 <script>
-  const APP_VERSION = '1.0.8';
+  const APP_VERSION = '1.0.9';
 </script>
 
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -358,7 +358,7 @@ function bindUndoTracking() {
   }, true);
 
   document.getElementById('menu-categories-list').addEventListener('click', (e) => {
-    const actionButton = e.target.closest('[data-action="add-item"], [data-action="move-item-up"], [data-action="move-item-down"], [data-action="delete-item"], [data-action="move-category-up"], [data-action="move-category-down"]');
+  const actionButton = e.target.closest('[data-action="add-item"], [data-action="move-item-up"], [data-action="move-item-down"], [data-action="delete-item"], [data-action="move-category-up"], [data-action="move-category-down"], [data-action="delete-category"]');
     if (!actionButton) return;
 
     pushUndoSnapshot(`menu-action-${Date.now()}`, true);
@@ -456,6 +456,14 @@ function renderMenuCategories(menu) {
       class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
     >
       ↓
+    </button>
+    <button
+      type="button"
+      data-action="delete-category"
+      data-category-index="${index}"
+      class="rounded-lg border border-red-400/30 bg-red-500/12 px-3 py-1.5 text-sm font-bold text-red-300"
+    >
+      <i data-lucide="trash-2" class="w-4 h-4"></i>
     </button>
   </div>
 
@@ -649,6 +657,19 @@ function deleteItem(categoryIndex, itemIndex) {
   if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
 
   currentRestaurantData.menu.categories[categoryIndex].items.splice(itemIndex, 1);
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function deleteCategory(categoryIndex) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
+
+  currentRestaurantData.menu.categories.splice(categoryIndex, 1);
+
+  currentRestaurantData.menu.categories.forEach((category, index) => {
+    category.order = index + 1;
+  });
+
   renderMenuCategories(currentRestaurantData.menu);
 }
 
@@ -892,6 +913,15 @@ if (moveCategoryDownButton) {
   if (Number.isNaN(categoryIndex)) return;
 
   moveCategory(categoryIndex, 'down');
+  return;
+}
+
+const deleteCategoryButton = e.target.closest('[data-action="delete-category"]');
+if (deleteCategoryButton) {
+  const categoryIndex = Number(deleteCategoryButton.dataset.categoryIndex);
+  if (Number.isNaN(categoryIndex)) return;
+
+  deleteCategory(categoryIndex);
   return;
 }
 
