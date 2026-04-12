@@ -87,24 +87,14 @@
 
       <main class="p-5 md:p-8">
 <header class="mb-8 flex flex-col gap-4">
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <button
-      id="back-btn"
-      type="button"
-      class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-cream/80"
-    >
-      <i data-lucide="arrow-left" class="w-4 h-4 text-gold"></i>
-      <span>Retour</span>
-    </button>
-
-   <div class="flex flex-wrap items-center justify-between gap-3">
+<div class="flex flex-wrap items-center justify-between gap-3">
   <button
     id="undo-btn-top"
     type="button"
     class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-cream/80"
   >
     <i data-lucide="corner-up-left" class="w-4 h-4 text-gold"></i>
-<span>↶ Retour</span>
+    <span>↶ Retour</span>
   </button>
 
   <div class="flex flex-wrap items-center gap-2">
@@ -483,11 +473,6 @@ function renderMenuCategories(menu) {
   </button>
 </div>
 </div>
-
-        <div class="text-xs text-gold flex-shrink-0 ml-3">
-          ${(category.items || []).length} plat(s)
-        </div>
-      </div>
 
       <div class="mt-4 space-y-2">
         ${(category.items || []).length ? (category.items || []).map((item, itemIndex) => `
@@ -971,10 +956,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (window.lucide) lucide.createIcons();
 });
-});
 
-  if (window.lucide) lucide.createIcons();
-});
   </script>
 </body>
 </html>
