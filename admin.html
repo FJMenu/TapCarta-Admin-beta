@@ -379,7 +379,8 @@ function renderMenuCategories(menu) {
     data-field="item-price"
     class="w-24 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gold text-right outline-none"
   >
-  <label class="mt-2 inline-flex items-center justify-end gap-2 text-[11px] ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
+<div class="mt-2 flex flex-col items-end gap-2">
+  <label class="inline-flex items-center justify-end gap-2 text-[11px] ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
     <span>${item.visible ? 'Visible' : 'Masqué'}</span>
     <input
       type="checkbox"
@@ -390,6 +391,28 @@ function renderMenuCategories(menu) {
       class="w-4 h-4 accent-yellow-400"
     >
   </label>
+
+  <div class="flex items-center gap-2">
+    <button
+      type="button"
+      data-action="move-item-up"
+      data-category-index="${index}"
+      data-item-index="${itemIndex}"
+      class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
+    >
+      ↑
+    </button>
+    <button
+      type="button"
+      data-action="move-item-down"
+      data-category-index="${index}"
+      data-item-index="${itemIndex}"
+      class="rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[11px] text-cream/80"
+    >
+      ↓
+    </button>
+  </div>
+</div>
 </div>
             </div>
           </div>
@@ -442,6 +465,19 @@ currentRestaurantData.menu.categories.unshift({
   items: []
 });
 
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function moveItem(categoryIndex, itemIndex, direction) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
+
+  const items = currentRestaurantData.menu.categories[categoryIndex].items;
+  const targetIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= items.length) return;
+
+  [items[itemIndex], items[targetIndex]] = [items[targetIndex], items[itemIndex]];
   renderMenuCategories(currentRestaurantData.menu);
 }
 
@@ -639,13 +675,35 @@ document.getElementById('menu-categories-list').addEventListener('change', (e) =
 });
 
 document.getElementById('menu-categories-list').addEventListener('click', (e) => {
-  const button = e.target.closest('[data-action="add-item"]');
-  if (!button) return;
+  const addButton = e.target.closest('[data-action="add-item"]');
+  if (addButton) {
+    const categoryIndex = Number(addButton.dataset.categoryIndex);
+    if (Number.isNaN(categoryIndex)) return;
 
-  const categoryIndex = Number(button.dataset.categoryIndex);
-  if (Number.isNaN(categoryIndex)) return;
+    addItemToCategory(categoryIndex);
+    return;
+  }
 
-  addItemToCategory(categoryIndex);
+  const moveUpButton = e.target.closest('[data-action="move-item-up"]');
+  if (moveUpButton) {
+    const categoryIndex = Number(moveUpButton.dataset.categoryIndex);
+    const itemIndex = Number(moveUpButton.dataset.itemIndex);
+
+    if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+
+    moveItem(categoryIndex, itemIndex, 'up');
+    return;
+  }
+
+  const moveDownButton = e.target.closest('[data-action="move-item-down"]');
+  if (moveDownButton) {
+    const categoryIndex = Number(moveDownButton.dataset.categoryIndex);
+    const itemIndex = Number(moveDownButton.dataset.itemIndex);
+
+    if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+
+    moveItem(categoryIndex, itemIndex, 'down');
+  }
 });
 
 document.getElementById('add-category-btn').addEventListener('click', () => {
