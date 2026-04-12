@@ -1,11 +1,11 @@
 {
   "identity": {
-    "id": "bistrobelga",
-    "name": "Bistro Belga",
-    "status": "active",
-    "plan": "standard",
-    "languages": ["fr", "es", "en", "nl"]
-  },
+  "id": "tapcarta-demo",
+  "name": "TapCarta Demo",
+  "status": "active",
+  "plan": "standard",
+  "languages": ["fr", "es", "en", "nl"]
+},
   "modules": {
     "web": false,
     "ordering": true,
