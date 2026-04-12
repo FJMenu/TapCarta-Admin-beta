@@ -356,11 +356,6 @@ function applyEditMode() {
   });
 }
 
-  document.querySelectorAll('#menu-categories-list input, #menu-categories-list button').forEach((element) => {
-    element.disabled = !editMode;
-  });
-}
-
 function undoLastChange() {
   if (!undoStack.length) return;
 
