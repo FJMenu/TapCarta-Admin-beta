@@ -4,8 +4,270 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TapCarta Admin</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: '#F2C744',
+            goldDark: '#D4A820',
+            dark: '#0F0F0F',
+            darkCard: '#1A1A1A',
+            cream: '#FAF6EE'
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['DM Sans', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background: #0F0F0F;
+      color: #FAF6EE;
+      font-family: 'DM Sans', sans-serif;
+    }
+  </style>
 </head>
 <body>
-  <h1>TapCarta Admin</h1>
+  <div class="min-h-screen bg-dark text-cream">
+    <div class="grid min-h-screen lg:grid-cols-[280px_1fr]">
+      
+      <aside class="border-r border-white/10 bg-black/20 p-5">
+        <div class="mb-8">
+          <h1 class="font-display text-2xl text-gold">TapCarta</h1>
+          <p class="text-sm text-cream/60 mt-1">Admin interne</p>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-xs uppercase tracking-wide text-cream/50 mb-2">
+            Établissement
+          </label>
+          <select id="restaurant-select" class="w-full rounded-xl border border-gold/25 bg-darkCard px-4 py-3 text-sm text-cream outline-none">
+            <option>Chargement...</option>
+          </select>
+        </div>
+
+        <nav class="space-y-2">
+          <button class="w-full flex items-center gap-3 rounded-xl border border-gold/20 bg-gold/10 px-4 py-3 text-sm font-semibold text-cream">
+            <i data-lucide="building-2" class="w-4 h-4 text-gold"></i>
+            <span>Établissement</span>
+          </button>
+
+          <button class="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
+            <i data-lucide="toggle-left" class="w-4 h-4 text-gold"></i>
+            <span>Modules</span>
+          </button>
+
+          <button class="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
+            <i data-lucide="utensils-crossed" class="w-4 h-4 text-gold"></i>
+            <span>Menu</span>
+          </button>
+
+          <button class="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
+            <i data-lucide="file-text" class="w-4 h-4 text-gold"></i>
+            <span>Contrat / Facturation</span>
+          </button>
+        </nav>
+      </aside>
+
+      <main class="p-5 md:p-8">
+        <header class="mb-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 class="font-display text-3xl text-cream">Tableau de gestion</h2>
+            <p class="text-sm text-cream/60 mt-1">
+              Base admin V1 — simple, fonctionnelle, évolutive
+            </p>
+          </div>
+
+          <div class="flex gap-3">
+            <button class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
+              Aperçu
+            </button>
+            <button class="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm font-semibold text-gold">
+              Enregistrer
+            </button>
+          </div>
+        </header>
+
+        <section class="grid gap-6 xl:grid-cols-3">
+          <article class="rounded-[24px] border border-gold/18 bg-gradient-to-br from-white/[0.04] to-white/[0.015] p-5 md:p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-2xl bg-gold/12 border border-gold/25 flex items-center justify-center">
+                <i data-lucide="building-2" class="w-5 h-5 text-gold"></i>
+              </div>
+              <div>
+                <h3 class="font-display text-lg font-bold text-cream">Établissement</h3>
+                <p class="text-xs text-cream/60 mt-1">Informations principales</p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs uppercase tracking-wide text-cream/45 mb-2">Nom</label>
+                <input id="field-name" type="text" class="w-full rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-cream outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-wide text-cream/45 mb-2">Statut</label>
+                <select id="field-status" class="w-full rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-cream outline-none">
+                  <option value="active">Actif</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-wide text-cream/45 mb-2">Formule</label>
+                <select id="field-plan" class="w-full rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-cream outline-none">
+                  <option value="light">Light</option>
+                  <option value="standard">Standard</option>
+                  <option value="standard_web">Standard + Web</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-wide text-cream/45 mb-2">Langues</label>
+                <input id="field-languages" type="text" class="w-full rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-cream outline-none" placeholder="fr, es, en, nl">
+              </div>
+            </div>
+          </article>
+
+          <article class="rounded-[24px] border border-gold/18 bg-gradient-to-br from-white/[0.04] to-white/[0.015] p-5 md:p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-2xl bg-gold/12 border border-gold/25 flex items-center justify-center">
+                <i data-lucide="toggle-left" class="w-5 h-5 text-gold"></i>
+              </div>
+              <div>
+                <h3 class="font-display text-lg font-bold text-cream">Modules</h3>
+                <p class="text-xs text-cream/60 mt-1">Activation rapide</p>
+              </div>
+            </div>
+
+            <div class="space-y-3" id="modules-list"></div>
+          </article>
+
+          <article class="rounded-[24px] border border-gold/18 bg-gradient-to-br from-white/[0.04] to-white/[0.015] p-5 md:p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-2xl bg-gold/12 border border-gold/25 flex items-center justify-center">
+                <i data-lucide="file-text" class="w-5 h-5 text-gold"></i>
+              </div>
+              <div>
+                <h3 class="font-display text-lg font-bold text-cream">Contrat / Facturation</h3>
+                <p class="text-xs text-cream/60 mt-1">Prévu dès la V1</p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="rounded-xl border border-white/8 bg-black/15 px-4 py-3">
+                <div class="text-xs uppercase tracking-wide text-cream/45 mb-1">Prix formule</div>
+                <div id="billing-plan-price" class="text-sm font-semibold text-cream">—</div>
+              </div>
+
+              <div class="rounded-xl border border-white/8 bg-black/15 px-4 py-3">
+                <div class="text-xs uppercase tracking-wide text-cream/45 mb-1">Options</div>
+                <div id="billing-options-price" class="text-sm font-semibold text-cream">—</div>
+              </div>
+
+              <div class="rounded-xl border border-gold/20 bg-gold/10 px-4 py-3">
+                <div class="text-xs uppercase tracking-wide text-gold/80 mb-1">Total mensuel</div>
+                <div id="billing-total" class="text-lg font-bold text-gold">—</div>
+              </div>
+
+              <div class="rounded-xl border border-white/8 bg-black/15 px-4 py-3">
+                <div class="text-xs uppercase tracking-wide text-cream/45 mb-1">Statut facturation</div>
+                <div id="billing-status" class="text-sm font-semibold text-cream">—</div>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    let restaurantsIndex = [];
+    let currentRestaurantId = null;
+    let currentRestaurantData = null;
+
+    function formatPrice(value) {
+      return `${value} € / mois`;
+    }
+
+    function renderModules(modules) {
+      const container = document.getElementById('modules-list');
+      const labels = {
+        web: 'Web',
+        ordering: 'Commande',
+        booking: 'Réservation',
+        googleReviews: 'Google Reviews',
+        whatsapp: 'WhatsApp'
+      };
+
+      container.innerHTML = Object.entries(modules).map(([key, value]) => `
+        <label class="flex items-center justify-between rounded-xl border border-white/8 bg-black/15 px-4 py-3">
+          <span class="text-sm text-cream">${labels[key] || key}</span>
+          <input type="checkbox" data-module="${key}" ${value ? 'checked' : ''} class="w-4 h-4 accent-yellow-400">
+        </label>
+      `).join('');
+    }
+
+    function fillForm(data) {
+      document.getElementById('field-name').value = data.identity.name || '';
+      document.getElementById('field-status').value = data.identity.status || 'active';
+      document.getElementById('field-plan').value = data.identity.plan || 'standard';
+      document.getElementById('field-languages').value = (data.identity.languages || []).join(', ');
+
+      renderModules(data.modules);
+
+      document.getElementById('billing-plan-price').textContent = formatPrice(data.billing.planPrice || 0);
+      document.getElementById('billing-options-price').textContent =
+        `${(data.billing.orderingBookingOption || 0) + (data.billing.extraLanguages || 0) + (data.billing.webOption || 0)} € / mois`;
+      document.getElementById('billing-total').textContent = formatPrice(data.billing.monthlyTotal || 0);
+      document.getElementById('billing-status').textContent = data.billing.billingStatus || '—';
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function loadRestaurantData(id) {
+      const response = await fetch(`./restaurants/${id}.json`);
+      const data = await response.json();
+      currentRestaurantData = data;
+      currentRestaurantId = id;
+      fillForm(data);
+    }
+
+    async function loadRestaurantsIndex() {
+      const response = await fetch('./restaurants/index.json');
+      restaurantsIndex = await response.json();
+
+      const select = document.getElementById('restaurant-select');
+      select.innerHTML = restaurantsIndex.map(item => `
+        <option value="${item.id}">${item.name}</option>
+      `).join('');
+
+      if (restaurantsIndex.length) {
+        await loadRestaurantData(restaurantsIndex[0].id);
+      }
+
+      select.addEventListener('change', async (e) => {
+        await loadRestaurantData(e.target.value);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadRestaurantsIndex();
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
