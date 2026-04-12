@@ -1,0 +1,27 @@
+{
+  "identity": {
+    "id": "bistrobelga",
+    "name": "Bistro Belga",
+    "status": "active",
+    "plan": "standard",
+    "languages": ["fr", "es", "en", "nl"]
+  },
+  "modules": {
+    "web": false,
+    "ordering": true,
+    "booking": true,
+    "googleReviews": true,
+    "whatsapp": true
+  },
+  "menu": {
+    "categories": []
+  },
+  "billing": {
+    "planPrice": 30,
+    "orderingBookingOption": 10,
+    "extraLanguages": 0,
+    "webOption": 0,
+    "monthlyTotal": 40,
+    "billingStatus": "active"
+  }
+}
