@@ -456,13 +456,25 @@ function bindFormEvents() {
 
 document.getElementById('menu-categories-list').addEventListener('input', (e) => {
   if (!currentRestaurantData) return;
-  if (e.target.dataset.field !== 'category-name') return;
 
-  const categoryIndex = Number(e.target.dataset.categoryIndex);
-  if (Number.isNaN(categoryIndex)) return;
-  if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
+  if (e.target.dataset.field === 'category-name') {
+    const categoryIndex = Number(e.target.dataset.categoryIndex);
+    if (Number.isNaN(categoryIndex)) return;
+    if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
 
-  currentRestaurantData.menu.categories[categoryIndex].name = e.target.value;
+    currentRestaurantData.menu.categories[categoryIndex].name = e.target.value;
+    return;
+  }
+
+  if (e.target.dataset.field === 'item-name') {
+    const categoryIndex = Number(e.target.dataset.categoryIndex);
+    const itemIndex = Number(e.target.dataset.itemIndex);
+
+    if (Number.isNaN(categoryIndex) || Number.isNaN(itemIndex)) return;
+    if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items?.[itemIndex]) return;
+
+    currentRestaurantData.menu.categories[categoryIndex].items[itemIndex].name = e.target.value;
+  }
 });
 }
 
