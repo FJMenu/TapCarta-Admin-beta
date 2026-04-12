@@ -577,6 +577,8 @@ function renderMenuCategories(menu) {
       </div>
     </div>
   `).join('');
+
+  if (window.lucide) lucide.createIcons();
 }
 function addItemToCategory(categoryIndex) {
   if (!currentRestaurantData) return;
