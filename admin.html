@@ -411,13 +411,13 @@ function addItemToCategory(categoryIndex) {
     category.items = [];
   }
 
-  category.items.push({
-    id: `nouveau-plat-${Date.now()}`,
-    name: 'Nouveau plat',
-    subtitle: '',
-    price: 0,
-    visible: true
-  });
+ category.items.unshift({
+  id: `nouveau-plat-${Date.now()}`,
+  name: 'Nouveau plat',
+  subtitle: '',
+  price: 0,
+  visible: true
+});
 
   renderMenuCategories(currentRestaurantData.menu);
 }
@@ -435,12 +435,12 @@ function addCategory() {
 
   const nextOrder = currentRestaurantData.menu.categories.length + 1;
 
-  currentRestaurantData.menu.categories.push({
-    id: `nouvelle-categorie-${Date.now()}`,
-    name: 'Nouvelle catégorie',
-    order: nextOrder,
-    items: []
-  });
+currentRestaurantData.menu.categories.unshift({
+  id: `nouvelle-categorie-${Date.now()}`,
+  name: 'Nouvelle catégorie',
+  order: nextOrder,
+  items: []
+});
 
   renderMenuCategories(currentRestaurantData.menu);
 }
