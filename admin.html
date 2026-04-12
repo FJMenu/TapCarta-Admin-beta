@@ -82,23 +82,34 @@
       </aside>
 
       <main class="p-5 md:p-8">
-        <header class="mb-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 class="font-display text-3xl text-cream">Tableau de gestion</h2>
-            <p class="text-sm text-cream/60 mt-1">
-              Base admin V1 — simple, fonctionnelle, évolutive
-            </p>
-          </div>
+<header class="mb-8 flex flex-col gap-4">
+  <div class="flex flex-wrap items-center gap-2">
+    <span class="inline-flex items-center rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
+      V1.0.1
+    </span>
+    <span class="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-cream/70">
+      beta interne
+    </span>
+  </div>
 
-          <div class="flex gap-3">
-            <button class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
-              Aperçu
-            </button>
-            <button class="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm font-semibold text-gold">
-              Enregistrer
-            </button>
-          </div>
-        </header>
+  <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h2 class="font-display text-3xl text-cream">Tableau de gestion</h2>
+      <p class="text-sm text-cream/60 mt-1">
+        Base admin V1 — simple, fonctionnelle, évolutive
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <button class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-cream/80">
+        Aperçu
+      </button>
+      <button class="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm font-semibold text-gold">
+        Enregistrer
+      </button>
+    </div>
+  </div>
+</header>
 
         <section class="grid gap-6 xl:grid-cols-3">
           <article class="rounded-[24px] border border-gold/18 bg-gradient-to-br from-white/[0.04] to-white/[0.015] p-5 md:p-6">
@@ -221,6 +232,31 @@
       `).join('');
     }
 
+       function recalculateBilling() {
+      if (!currentRestaurantData) return;
+
+      const plan = currentRestaurantData.identity.plan || 'standard';
+      const modules = currentRestaurantData.modules || {};
+      const languages = currentRestaurantData.identity.languages || [];
+
+      let planPrice = 0;
+      if (plan === 'light') planPrice = 20;
+      if (plan === 'standard') planPrice = 30;
+      if (plan === 'standard_web') planPrice = 40;
+
+      const orderingBookingOption = (modules.ordering || modules.booking) ? 10 : 0;
+      const webOption = modules.web ? 10 : 0;
+      const extraLanguagesCount = Math.max(0, languages.length - 4);
+      const extraLanguages = extraLanguagesCount * 5;
+      const monthlyTotal = planPrice + orderingBookingOption + webOption + extraLanguages;
+
+      currentRestaurantData.billing.planPrice = planPrice;
+      currentRestaurantData.billing.orderingBookingOption = orderingBookingOption;
+      currentRestaurantData.billing.webOption = webOption;
+      currentRestaurantData.billing.extraLanguages = extraLanguages;
+      currentRestaurantData.billing.monthlyTotal = monthlyTotal;
+    }
+
     function fillForm(data) {
       document.getElementById('field-name').value = data.identity.name || '';
       document.getElementById('field-status').value = data.identity.status || 'active';
@@ -228,6 +264,7 @@
       document.getElementById('field-languages').value = (data.identity.languages || []).join(', ');
 
       renderModules(data.modules);
+      recalculateBilling();
 
       document.getElementById('billing-plan-price').textContent = formatPrice(data.billing.planPrice || 0);
       document.getElementById('billing-options-price').textContent =
@@ -236,6 +273,51 @@
       document.getElementById('billing-status').textContent = data.billing.billingStatus || '—';
 
       if (window.lucide) lucide.createIcons();
+    }
+
+    function bindFormEvents() {
+      document.getElementById('field-name').addEventListener('input', (e) => {
+        if (!currentRestaurantData) return;
+        currentRestaurantData.identity.name = e.target.value;
+      });
+
+      document.getElementById('field-status').addEventListener('change', (e) => {
+        if (!currentRestaurantData) return;
+        currentRestaurantData.identity.status = e.target.value;
+      });
+
+      document.getElementById('field-plan').addEventListener('change', (e) => {
+        if (!currentRestaurantData) return;
+        currentRestaurantData.identity.plan = e.target.value;
+        fillForm(currentRestaurantData);
+      });
+
+      document.getElementById('field-languages').addEventListener('input', (e) => {
+        if (!currentRestaurantData) return;
+
+        currentRestaurantData.identity.languages = e.target.value
+          .split(',')
+          .map(item => item.trim())
+          .filter(Boolean);
+
+        recalculateBilling();
+        document.getElementById('billing-options-price').textContent =
+          `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
+        document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
+      });
+
+      document.getElementById('modules-list').addEventListener('change', (e) => {
+        if (!currentRestaurantData) return;
+        if (!e.target.matches('input[type="checkbox"][data-module]')) return;
+
+        const moduleKey = e.target.dataset.module;
+        currentRestaurantData.modules[moduleKey] = e.target.checked;
+
+        recalculateBilling();
+        document.getElementById('billing-options-price').textContent =
+          `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
+        document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
+      });
     }
 
     async function loadRestaurantData(id) {
@@ -264,8 +346,9 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
+     document.addEventListener('DOMContentLoaded', async () => {
       await loadRestaurantsIndex();
+      bindFormEvents();
       if (window.lucide) lucide.createIcons();
     });
   </script>
