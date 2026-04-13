@@ -747,9 +747,6 @@ function addCategory() {
   renderMenuCategories(currentRestaurantData.menu);
 }
 
-  renderMenuCategories(currentRestaurantData.menu);
-}
-
 function moveItem(categoryIndex, itemIndex, direction) {
   if (!currentRestaurantData) return;
   if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
