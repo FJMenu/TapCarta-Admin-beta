@@ -323,18 +323,42 @@ function resetDirtyState() {
   updateDirtyStatusDisplay();
 }
 
+function updateDirtyStatusDisplay() {
+  const dirtyStatus = document.getElementById('dirty-status');
+  const dirtyStatusBottom = document.getElementById('dirty-status-bottom');
+
+  const text = isDirty ? 'Modifications non enregistrées' : 'À jour';
+  const classToAdd = isDirty ? 'text-amber-400' : 'text-slate-400';
+  const classToRemove = isDirty ? 'text-slate-400' : 'text-amber-400';
+
+  if (dirtyStatus) {
+    dirtyStatus.textContent = text;
+    dirtyStatus.classList.remove(classToRemove);
+    dirtyStatus.classList.add(classToAdd);
+  }
+
+  if (dirtyStatusBottom) {
+    dirtyStatusBottom.textContent = text;
+    dirtyStatusBottom.classList.remove(classToRemove);
+    dirtyStatusBottom.classList.add(classToAdd);
+  }
+}
+
 function syncDirtyStateWithSnapshot() {
   if (!currentRestaurantData) {
     isDirty = false;
+    updateDirtyStatusDisplay();
     return;
   }
 
   if (!lastSavedSnapshot) {
     isDirty = false;
+    updateDirtyStatusDisplay();
     return;
   }
 
   isDirty = createRestaurantSnapshot() !== lastSavedSnapshot;
+  updateDirtyStatusDisplay();
 }
 
 function pushUndoSnapshot(sourceKey, force = false) {
