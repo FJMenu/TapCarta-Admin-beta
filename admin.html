@@ -314,11 +314,13 @@ function createRestaurantSnapshot() {
 function markDirty() {
   if (!currentRestaurantData) return;
   isDirty = true;
+  updateDirtyStatusDisplay();
 }
 
 function resetDirtyState() {
   lastSavedSnapshot = createRestaurantSnapshot();
   isDirty = false;
+  updateDirtyStatusDisplay();
 }
 
 function syncDirtyStateWithSnapshot() {
