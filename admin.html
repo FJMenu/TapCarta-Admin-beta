@@ -733,14 +733,19 @@ function addCategory() {
     currentRestaurantData.menu.categories = [];
   }
 
-  const nextOrder = currentRestaurantData.menu.categories.length + 1;
+  currentRestaurantData.menu.categories.unshift({
+    id: `nouvelle-categorie-${Date.now()}`,
+    name: 'Nouvelle catégorie',
+    order: 1,
+    items: []
+  });
 
-currentRestaurantData.menu.categories.unshift({
-  id: `nouvelle-categorie-${Date.now()}`,
-  name: 'Nouvelle catégorie',
-  order: nextOrder,
-  items: []
-});
+  currentRestaurantData.menu.categories.forEach((category, index) => {
+    category.order = index + 1;
+  });
+
+  renderMenuCategories(currentRestaurantData.menu);
+}
 
   renderMenuCategories(currentRestaurantData.menu);
 }
