@@ -279,19 +279,50 @@
   </div>
 
   <script>
-    let restaurantsIndex = [];
-    let currentRestaurantId = null;
+let restaurantsIndex = [];
+let currentRestaurantId = null;
 let currentRestaurantData = null;
 let undoStack = [];
 let activeUndoSource = null;
 let editMode = false;
+let isDirty = false;
+let lastSavedSnapshot = null;
 
-    function formatPrice(value) {
-      return `${value} € / mois`;
-    }
+function formatPrice(value) {
+  return `${value} € / mois`;
+}
 
 function cloneCurrentRestaurantData() {
   return JSON.parse(JSON.stringify(currentRestaurantData));
+}
+
+function createRestaurantSnapshot() {
+  if (!currentRestaurantData) return null;
+  return JSON.stringify(currentRestaurantData);
+}
+
+function markDirty() {
+  if (!currentRestaurantData) return;
+  isDirty = true;
+}
+
+function resetDirtyState() {
+  lastSavedSnapshot = createRestaurantSnapshot();
+  isDirty = false;
+}
+
+function syncDirtyStateWithSnapshot() {
+  if (!currentRestaurantData) {
+    isDirty = false;
+    return;
+  }
+
+  if (!lastSavedSnapshot) {
+    isDirty = false;
+    return;
+  }
+
+  isDirty = createRestaurantSnapshot() !== lastSavedSnapshot;
 }
 
 function pushUndoSnapshot(sourceKey, force = false) {
