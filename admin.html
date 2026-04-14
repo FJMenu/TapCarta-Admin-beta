@@ -645,17 +645,17 @@ function renderMenuCategories(menu) {
     class="w-24 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gold text-right outline-none"
   >
 <div class="mt-2 flex flex-col items-end gap-2">
-  <label class="inline-flex items-center justify-end gap-2 text-[11px] ${item.visible ? 'text-emerald-300' : 'text-red-300'}">
-    <span>${item.visible ? 'Visible' : 'Masqué'}</span>
-    <input
-      type="checkbox"
-      ${item.visible ? 'checked' : ''}
-      data-category-index="${index}"
-      data-item-index="${itemIndex}"
-      data-field="item-visible"
-      class="w-4 h-4 accent-yellow-400"
-    >
-  </label>
+  <label class="inline-flex items-center justify-end gap-2 text-[11px] ${item.visible !== false ? 'text-emerald-300' : 'text-red-300'}">
+  <span>${item.visible !== false ? 'Visible' : 'Masqué'}</span>
+  <input
+    type="checkbox"
+    ${item.visible !== false ? 'checked' : ''}
+    data-category-index="${index}"
+    data-item-index="${itemIndex}"
+    data-field="item-visible"
+    class="w-4 h-4 accent-yellow-400"
+  >
+</label>
 
  <div class="flex items-center gap-2">
   <button
