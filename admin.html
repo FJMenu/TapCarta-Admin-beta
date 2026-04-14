@@ -702,6 +702,14 @@ function renderMenuCategories(menu) {
   if (window.lucide) lucide.createIcons();
   applyEditMode();
 }
+function syncItemOrder(category) {
+  if (!category || !Array.isArray(category.items)) return;
+
+  category.items.forEach((item, index) => {
+    item.order = index + 1;
+  });
+}
+
 function addItemToCategory(categoryIndex) {
   if (!currentRestaurantData) return;
   if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
@@ -711,14 +719,16 @@ function addItemToCategory(categoryIndex) {
     category.items = [];
   }
 
- category.items.unshift({
-  id: `nouveau-plat-${Date.now()}`,
-  name: 'Nouveau plat',
-  subtitle: '',
-  price: 0,
-  visible: true
-});
+  category.items.unshift({
+    id: `nouveau-plat-${Date.now()}`,
+    name: 'Nouveau plat',
+    subtitle: '',
+    price: 0,
+    visible: true,
+    order: 1
+  });
 
+  syncItemOrder(category);
   renderMenuCategories(currentRestaurantData.menu);
 }
 
@@ -742,6 +752,65 @@ function addCategory() {
 
   currentRestaurantData.menu.categories.forEach((category, index) => {
     category.order = index + 1;
+    syncItemOrder(category);
+  });
+
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function moveItem(categoryIndex, itemIndex, direction) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
+
+  const category = currentRestaurantData.menu.categories[categoryIndex];
+  const items = category.items;
+  const targetIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= items.length) return;
+
+  [items[itemIndex], items[targetIndex]] = [items[targetIndex], items[itemIndex]];
+  syncItemOrder(category);
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function moveCategory(categoryIndex, direction) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories) return;
+
+  const categories = currentRestaurantData.menu.categories;
+  const targetIndex = direction === 'up' ? categoryIndex - 1 : categoryIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= categories.length) return;
+
+  [categories[categoryIndex], categories[targetIndex]] = [categories[targetIndex], categories[categoryIndex]];
+
+  categories.forEach((category, index) => {
+    category.order = index + 1;
+    syncItemOrder(category);
+  });
+
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function deleteItem(categoryIndex, itemIndex) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
+
+  const category = currentRestaurantData.menu.categories[categoryIndex];
+  category.items.splice(itemIndex, 1);
+  syncItemOrder(category);
+  renderMenuCategories(currentRestaurantData.menu);
+}
+
+function deleteCategory(categoryIndex) {
+  if (!currentRestaurantData) return;
+  if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
+
+  currentRestaurantData.menu.categories.splice(categoryIndex, 1);
+
+  currentRestaurantData.menu.categories.forEach((category, index) => {
+    category.order = index + 1;
+    syncItemOrder(category);
   });
 
   renderMenuCategories(currentRestaurantData.menu);
