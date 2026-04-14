@@ -710,6 +710,14 @@ function syncItemOrder(category) {
   });
 }
 
+function syncItemOrder(category) {
+  if (!category || !Array.isArray(category.items)) return;
+
+  category.items.forEach((item, index) => {
+    item.order = index + 1;
+  });
+}
+
 function addItemToCategory(categoryIndex) {
   if (!currentRestaurantData) return;
   if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
@@ -811,58 +819,6 @@ function deleteCategory(categoryIndex) {
   currentRestaurantData.menu.categories.forEach((category, index) => {
     category.order = index + 1;
     syncItemOrder(category);
-  });
-
-  renderMenuCategories(currentRestaurantData.menu);
-}
-
-function moveItem(categoryIndex, itemIndex, direction) {
-  if (!currentRestaurantData) return;
-  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
-
-  const items = currentRestaurantData.menu.categories[categoryIndex].items;
-  const targetIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
-
-  if (targetIndex < 0 || targetIndex >= items.length) return;
-
-  [items[itemIndex], items[targetIndex]] = [items[targetIndex], items[itemIndex]];
-  renderMenuCategories(currentRestaurantData.menu);
-}
-
-function moveCategory(categoryIndex, direction) {
-  if (!currentRestaurantData) return;
-  if (!currentRestaurantData.menu?.categories) return;
-
-  const categories = currentRestaurantData.menu.categories;
-  const targetIndex = direction === 'up' ? categoryIndex - 1 : categoryIndex + 1;
-
-  if (targetIndex < 0 || targetIndex >= categories.length) return;
-
-  [categories[categoryIndex], categories[targetIndex]] = [categories[targetIndex], categories[categoryIndex]];
-
-  categories.forEach((category, index) => {
-    category.order = index + 1;
-  });
-
-  renderMenuCategories(currentRestaurantData.menu);
-}
-
-function deleteItem(categoryIndex, itemIndex) {
-  if (!currentRestaurantData) return;
-  if (!currentRestaurantData.menu?.categories?.[categoryIndex]?.items) return;
-
-  currentRestaurantData.menu.categories[categoryIndex].items.splice(itemIndex, 1);
-  renderMenuCategories(currentRestaurantData.menu);
-}
-
-function deleteCategory(categoryIndex) {
-  if (!currentRestaurantData) return;
-  if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
-
-  currentRestaurantData.menu.categories.splice(categoryIndex, 1);
-
-  currentRestaurantData.menu.categories.forEach((category, index) => {
-    category.order = index + 1;
   });
 
   renderMenuCategories(currentRestaurantData.menu);
