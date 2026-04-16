@@ -1150,9 +1150,18 @@ function bindFormEvents() {
     async function loadRestaurantData(id) {
       const response = await fetch(`./restaurants/${id}.json`);
       const data = await response.json();
+
+      if (!data.links) {
+        data.links = {};
+      }
+
+      if (typeof data.links.publicPage !== 'string') {
+        data.links.publicPage = '';
+      }
+
       currentRestaurantData = data;
       currentRestaurantId = id;
-      fillForm(data);
+      fillForm(currentRestaurantData);
     }
 
     async function loadRestaurantsIndex() {
