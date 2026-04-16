@@ -312,6 +312,82 @@ function formatPrice(value) {
   return `${value} € / mois`;
 }
 
+function normalizeRestaurantDataShape(data) {
+  if (!data.identity || typeof data.identity !== 'object') {
+    data.identity = {};
+  }
+
+  if (!data.modules || typeof data.modules !== 'object') {
+    data.modules = {};
+  }
+
+  if (!data.menu || typeof data.menu !== 'object') {
+    data.menu = {};
+  }
+
+  if (!Array.isArray(data.menu.categories)) {
+    data.menu.categories = [];
+  }
+
+  if (!data.billing || typeof data.billing !== 'object') {
+    data.billing = {};
+  }
+
+  if (!data.links || typeof data.links !== 'object') {
+    data.links = {};
+  }
+
+  if (!Array.isArray(data.identity.languages)) {
+    data.identity.languages = [];
+  }
+
+  if (typeof data.identity.id !== 'string') {
+    data.identity.id = '';
+  }
+
+  if (typeof data.identity.name !== 'string') {
+    data.identity.name = '';
+  }
+
+  if (typeof data.identity.status !== 'string') {
+    data.identity.status = 'active';
+  }
+
+  if (typeof data.identity.plan !== 'string') {
+    data.identity.plan = 'standard';
+  }
+
+  if (typeof data.links.publicPage !== 'string') {
+    data.links.publicPage = '';
+  }
+
+  if (typeof data.billing.planPrice !== 'number') {
+    data.billing.planPrice = 0;
+  }
+
+  if (typeof data.billing.orderingBookingOption !== 'number') {
+    data.billing.orderingBookingOption = 0;
+  }
+
+  if (typeof data.billing.extraLanguages !== 'number') {
+    data.billing.extraLanguages = 0;
+  }
+
+  if (typeof data.billing.webOption !== 'number') {
+    data.billing.webOption = 0;
+  }
+
+  if (typeof data.billing.monthlyTotal !== 'number') {
+    data.billing.monthlyTotal = 0;
+  }
+
+  if (typeof data.billing.billingStatus !== 'string') {
+    data.billing.billingStatus = 'active';
+  }
+
+  return data;
+}
+
 function cloneCurrentRestaurantData() {
   return JSON.parse(JSON.stringify(currentRestaurantData));
 }
@@ -1147,19 +1223,11 @@ function bindFormEvents() {
 
 
 
-    async function loadRestaurantData(id) {
+     async function loadRestaurantData(id) {
       const response = await fetch(`./restaurants/${id}.json`);
       const data = await response.json();
 
-      if (!data.links) {
-        data.links = {};
-      }
-
-      if (typeof data.links.publicPage !== 'string') {
-        data.links.publicPage = '';
-      }
-
-      currentRestaurantData = data;
+      currentRestaurantData = normalizeRestaurantDataShape(data);
       currentRestaurantId = id;
       fillForm(currentRestaurantData);
     }
