@@ -6,7 +6,7 @@
 <title>TapCarta Admin</title>
 
 <script>
-  const APP_VERSION = '1.0.11';
+  const APP_VERSION = '1.0.12';
 </script>
 
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -177,10 +177,20 @@
                 </select>
               </div>
 
-              <div>
-                <label class="block text-xs uppercase tracking-wide text-cream/45 mb-2">Langues</label>
-                <input id="field-languages" type="text" class="w-full rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-cream outline-none" placeholder="fr, es, en, nl">
-              </div>
+          <div>
+  <label class="block text-xs uppercase tracking-wide text-cream/45 mb-2">Langues</label>
+  <input id="field-languages" type="text" class="w-full rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-cream outline-none" placeholder="fr, es, en, nl">
+</div>
+
+<div>
+  <label class="block text-xs uppercase tracking-wide text-cream/45 mb-2">URL publique client</label>
+  <input
+    id="field-public-page"
+    type="text"
+    class="w-full rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-cream outline-none"
+    placeholder="https://tapcarta.com/nomduresto/"
+  >
+</div>
             </div>
           </article>
 
@@ -396,7 +406,8 @@ function applyEditMode() {
     document.getElementById('field-name'),
     document.getElementById('field-status'),
     document.getElementById('field-plan'),
-    document.getElementById('field-languages')
+    document.getElementById('field-languages'),
+    document.getElementById('field-public-page')
   ];
 
   editableFields.forEach((field) => {
@@ -855,6 +866,11 @@ function recalculateBilling() {
       document.getElementById('field-status').value = data.identity.status || 'active';
       document.getElementById('field-plan').value = data.identity.plan || 'standard';
       document.getElementById('field-languages').value = (data.identity.languages || []).join(', ');
+      document.getElementById('field-public-page').value =
+        data.links?.publicPage ||
+        data.links?.clientMenuUrl ||
+        data.technical?.clientMenuUrl ||
+        '';
 
         renderModules(data.modules);
       renderMenuCategories(data.menu);
@@ -932,7 +948,7 @@ function bindFormEvents() {
     markDirty();
   });
 
-  document.getElementById('field-languages').addEventListener('input', (e) => {
+   document.getElementById('field-languages').addEventListener('input', (e) => {
     if (!currentRestaurantData) return;
 
     currentRestaurantData.identity.languages = e.target.value
@@ -944,6 +960,17 @@ function bindFormEvents() {
     document.getElementById('billing-options-price').textContent =
       `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
     document.getElementById('billing-total').textContent = formatPrice(currentRestaurantData.billing.monthlyTotal || 0);
+    markDirty();
+  });
+
+  document.getElementById('field-public-page').addEventListener('input', (e) => {
+    if (!currentRestaurantData) return;
+
+    if (!currentRestaurantData.links) {
+      currentRestaurantData.links = {};
+    }
+
+    currentRestaurantData.links.publicPage = e.target.value.trim();
     markDirty();
   });
 
