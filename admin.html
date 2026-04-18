@@ -1084,6 +1084,13 @@ function bindFormEvents() {
     const moduleKey = e.target.dataset.module;
     currentRestaurantData.modules[moduleKey] = e.target.checked;
 
+    if (moduleKey === 'booking' && !e.target.checked) {
+      currentRestaurantData.modules.preorderIndicative = false;
+    }
+
+    renderModules(currentRestaurantData.modules);
+    applyEditMode();
+
     recalculateBilling();
     document.getElementById('billing-options-price').textContent =
       `${(currentRestaurantData.billing.orderingBookingOption || 0) + (currentRestaurantData.billing.extraLanguages || 0) + (currentRestaurantData.billing.webOption || 0)} € / mois`;
