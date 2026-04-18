@@ -615,12 +615,25 @@ function renderModules(modules) {
     whatsapp: 'WhatsApp'
   };
 
-  container.innerHTML = Object.entries(modules).map(([key, value]) => `
-    <label class="flex items-center justify-between rounded-xl border border-white/8 bg-black/15 px-4 py-3">
-      <span class="text-sm text-cream">${labels[key] || key}</span>
-      <input type="checkbox" data-module="${key}" ${value ? 'checked' : ''} class="w-4 h-4 accent-yellow-400">
-    </label>
-  `).join('');
+  const bookingEnabled = Boolean(modules.booking);
+
+  container.innerHTML = Object.entries(modules).map(([key, value]) => {
+    const isPreorderIndicative = key === 'preorderIndicative';
+    const isDisabled = isPreorderIndicative && !bookingEnabled;
+
+    return `
+      <label class="flex items-center justify-between rounded-xl border border-white/8 bg-black/15 px-4 py-3 ${isDisabled ? 'opacity-50' : ''}">
+        <span class="text-sm text-cream">${labels[key] || key}</span>
+        <input
+          type="checkbox"
+          data-module="${key}"
+          ${value ? 'checked' : ''}
+          ${isDisabled ? 'disabled' : ''}
+          class="w-4 h-4 accent-yellow-400"
+        >
+      </label>
+    `;
+  }).join('');
 }
 
 function renderMenuCategories(menu) {
