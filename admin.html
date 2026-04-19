@@ -923,7 +923,9 @@ function addItemToCategory(categoryIndex) {
     subtitle: '',
     price: 0,
     visible: true,
-    order: 1
+    available: true,
+    order: 1,
+    updatedAt: currentRestaurantData.menu?.updatedAt || ''
   });
 
   syncItemOrder(category);
@@ -934,7 +936,11 @@ function addCategory() {
   if (!currentRestaurantData) return;
 
   if (!currentRestaurantData.menu) {
-    currentRestaurantData.menu = { categories: [] };
+    currentRestaurantData.menu = {
+      categories: [],
+      menuVersion: 1,
+      updatedAt: ''
+    };
   }
 
   if (!Array.isArray(currentRestaurantData.menu.categories)) {
@@ -945,6 +951,7 @@ function addCategory() {
     id: `nouvelle-categorie-${Date.now()}`,
     name: 'Nouvelle catégorie',
     order: 1,
+    visible: true,
     items: []
   });
 
