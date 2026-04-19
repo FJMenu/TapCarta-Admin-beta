@@ -1066,6 +1066,59 @@ function recalculateBilling() {
 function downloadCurrentRestaurantJson() {
   if (!currentRestaurantData || !currentRestaurantId) return;
 
+  currentRestaurantData = normalizeRestaurantDataShape(currentRestaurantData);
+
+  let previousMenuSnapshot = null;
+  let previousMenuVersion = 0;
+
+  if (lastSavedSnapshot) {
+    try {
+      const previousSavedData = normalizeRestaurantDataShape(JSON.parse(lastSavedSnapshot));
+      previousMenuSnapshot = JSON.stringify(previousSavedData.menu || {});
+      previousMenuVersion = Number.isFinite(previousSavedData.menu?.menuVersion)
+        ? previousSavedData.menu.menuVersion
+        : 0;
+    } catch (error) {
+      previousMenuSnapshot = null;
+      previousMenuVersion = 0;
+    }
+  }
+
+  const currentMenuSnapshotBeforeStamp = JSON.stringify(currentRestaurantData.menu || {});
+  const menuChanged =
+    previousMenuSnapshot !== null &&
+    previousMenuSnapshot !== currentMenuSnapshotBeforeStamp;
+
+  if (menuChanged) {
+    const nowIso = new Date().toISOString();
+
+    currentRestaurantData.menu.menuVersion = Math.max(previousMenuVersion + 1, 1);
+    currentRestaurantData.menu.updatedAt = nowIso;
+
+    currentRestaurantData.menu.categories.forEach((category) => {
+      if (!Array.isArray(category.items)) return;
+
+      category.items.forEach((item) => {
+        item.updatedAt = nowIso;
+      });
+    });
+  } else if (!currentRestaurantData.menu.updatedAt && currentRestaurantData.menu.categories.length > 0) {
+    const nowIso = new Date().toISOString();
+
+    currentRestaurantData.menu.menuVersion = Math.max(currentRestaurantData.menu.menuVersion || 1, 1);
+    currentRestaurantData.menu.updatedAt = nowIso;
+
+    currentRestaurantData.menu.categories.forEach((category) => {
+      if (!Array.isArray(category.items)) return;
+
+      category.items.forEach((item) => {
+        if (!item.updatedAt) {
+          item.updatedAt = nowIso;
+        }
+      });
+    });
+  }
+
   const jsonString = JSON.stringify(currentRestaurantData, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1099,7 +1152,7 @@ function downloadCurrentRestaurantJson() {
     if (saveStatusBottom) {
       saveStatusBottom.classList.add('hidden');
     }
-    }, 4000);
+  }, 4000);
 
   editMode = false;
   updateEditModeButton();
