@@ -1273,28 +1273,7 @@ function bindFormEvents() {
       if (Number.isNaN(categoryIndex)) return;
       if (!currentRestaurantData.menu?.categories?.[categoryIndex]) return;
 
-      const category = currentRestaurantData.menu.categories[categoryIndex];
-
-      const canonicalCategoryNames = {
-        snacks: 'Snacks',
-        entrees: 'Entrées',
-        plats: 'Plats',
-        moules: 'Moules',
-        desserts: 'Desserts',
-        crepes: 'Crêpes',
-        suggestions: 'Suggestions',
-        supplements: 'Suppléments',
-        boissons: 'Boissons'
-      };
-
-      if (canonicalCategoryNames[category.id]) {
-        category.name = canonicalCategoryNames[category.id];
-        e.target.value = canonicalCategoryNames[category.id];
-        markDirty();
-        return;
-      }
-
-      category.name = e.target.value;
+      currentRestaurantData.menu.categories[categoryIndex].name = e.target.value;
       markDirty();
       return;
     }
