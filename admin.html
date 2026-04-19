@@ -6,7 +6,7 @@
 <title>TapCarta Admin</title>
 
 <script>
-  const APP_VERSION = '1.0.14';
+  const APP_VERSION = 'V1.0.15';
 </script>
 
 <link rel="icon" type="image/png" href="./favicon.png?v=1.0.13">
@@ -317,6 +317,10 @@ function formatPrice(value) {
 }
 
 function normalizeRestaurantDataShape(data) {
+  if (!data || typeof data !== 'object') {
+    data = {};
+  }
+
   if (!data.identity || typeof data.identity !== 'object') {
     data.identity = {};
   }
@@ -341,6 +345,78 @@ function normalizeRestaurantDataShape(data) {
   if (!Array.isArray(data.menu.categories)) {
     data.menu.categories = [];
   }
+
+  if (typeof data.menu.menuVersion !== 'number') {
+    data.menu.menuVersion = 1;
+  }
+
+  if (typeof data.menu.updatedAt !== 'string') {
+    data.menu.updatedAt = '';
+  }
+
+  data.menu.categories = data.menu.categories.map((category, categoryIndex) => {
+    const normalizedCategory = category && typeof category === 'object' ? category : {};
+
+    if (typeof normalizedCategory.id !== 'string') {
+      normalizedCategory.id = `categorie-${categoryIndex + 1}`;
+    }
+
+    if (typeof normalizedCategory.name !== 'string') {
+      normalizedCategory.name = '';
+    }
+
+    if (typeof normalizedCategory.order !== 'number') {
+      normalizedCategory.order = categoryIndex + 1;
+    }
+
+    if (typeof normalizedCategory.visible !== 'boolean') {
+      normalizedCategory.visible = true;
+    }
+
+    if (!Array.isArray(normalizedCategory.items)) {
+      normalizedCategory.items = [];
+    }
+
+    normalizedCategory.items = normalizedCategory.items.map((item, itemIndex) => {
+      const normalizedItem = item && typeof item === 'object' ? item : {};
+
+      if (typeof normalizedItem.id !== 'string') {
+        normalizedItem.id = `item-${categoryIndex + 1}-${itemIndex + 1}`;
+      }
+
+      if (typeof normalizedItem.name !== 'string') {
+        normalizedItem.name = '';
+      }
+
+      if (typeof normalizedItem.subtitle !== 'string') {
+        normalizedItem.subtitle = '';
+      }
+
+      if (typeof normalizedItem.price !== 'number') {
+        normalizedItem.price = 0;
+      }
+
+      if (typeof normalizedItem.visible !== 'boolean') {
+        normalizedItem.visible = true;
+      }
+
+      if (typeof normalizedItem.available !== 'boolean') {
+        normalizedItem.available = true;
+      }
+
+      if (typeof normalizedItem.order !== 'number') {
+        normalizedItem.order = itemIndex + 1;
+      }
+
+      if (typeof normalizedItem.updatedAt !== 'string') {
+        normalizedItem.updatedAt = data.menu.updatedAt || '';
+      }
+
+      return normalizedItem;
+    });
+
+    return normalizedCategory;
+  });
 
   if (!data.billing || typeof data.billing !== 'object') {
     data.billing = {};
