@@ -1060,7 +1060,9 @@ function recalculateBilling() {
 
       const plan = currentRestaurantData.identity.plan || 'standard';
       const modules = currentRestaurantData.modules || {};
-      const languages = currentRestaurantData.identity.languages || [];
+      const languages = Array.isArray(currentRestaurantData.languages?.active)
+        ? currentRestaurantData.languages.active
+        : (currentRestaurantData.identity.languages || []);
 
       let planPrice = 0;
       if (plan === 'light') planPrice = 20;
@@ -1081,10 +1083,19 @@ function recalculateBilling() {
     }
 
     function fillForm(data) {
+      const lifecycleStatus =
+        data.status?.lifecycle ||
+        data.identity?.status ||
+        'active';
+
+      const activeLanguages = Array.isArray(data.languages?.active)
+        ? data.languages.active
+        : (Array.isArray(data.identity?.languages) ? data.identity.languages : []);
+
       document.getElementById('field-name').value = data.identity.name || '';
-      document.getElementById('field-status').value = data.identity.status || 'active';
+      document.getElementById('field-status').value = lifecycleStatus;
       document.getElementById('field-plan').value = data.identity.plan || 'standard';
-      document.getElementById('field-languages').value = (data.identity.languages || []).join(', ');
+      document.getElementById('field-languages').value = activeLanguages.join(', ');
       document.getElementById('field-public-page').value =
         data.links?.publicPage ||
         data.links?.clientMenuUrl ||
