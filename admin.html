@@ -6,7 +6,7 @@
 <title>TapCarta Admin</title>
 
 <script>
-  const APP_VERSION = 'V1.0.15';
+  const APP_VERSION = 'V1.0.16';
 </script>
 
 <link rel="icon" type="image/png" href="./favicon.png?v=1.0.13">
@@ -329,6 +329,26 @@ function normalizeRestaurantDataShape(data) {
     data.modules = {};
   }
 
+  if (!data.menu || typeof data.menu !== 'object') {
+    data.menu = {};
+  }
+
+  if (!data.links || typeof data.links !== 'object') {
+    data.links = {};
+  }
+
+  if (!data.billing || typeof data.billing !== 'object') {
+    data.billing = {};
+  }
+
+  if (!data.status || typeof data.status !== 'object') {
+    data.status = {};
+  }
+
+  if (!data.languages || typeof data.languages !== 'object') {
+    data.languages = {};
+  }
+
   data.modules = {
     web: Boolean(data.modules.web),
     ordering: Boolean(data.modules.ordering),
@@ -337,10 +357,6 @@ function normalizeRestaurantDataShape(data) {
     googleReviews: Boolean(data.modules.googleReviews),
     whatsapp: Boolean(data.modules.whatsapp)
   };
-
-  if (!data.menu || typeof data.menu !== 'object') {
-    data.menu = {};
-  }
 
   if (!Array.isArray(data.menu.categories)) {
     data.menu.categories = [];
@@ -418,18 +434,6 @@ function normalizeRestaurantDataShape(data) {
     return normalizedCategory;
   });
 
-  if (!data.billing || typeof data.billing !== 'object') {
-    data.billing = {};
-  }
-
-  if (!data.links || typeof data.links !== 'object') {
-    data.links = {};
-  }
-
-  if (!Array.isArray(data.identity.languages)) {
-    data.identity.languages = [];
-  }
-
   if (typeof data.identity.id !== 'string') {
     data.identity.id = '';
   }
@@ -438,16 +442,33 @@ function normalizeRestaurantDataShape(data) {
     data.identity.name = '';
   }
 
-  if (typeof data.identity.status !== 'string') {
-    data.identity.status = 'active';
-  }
-
   if (typeof data.identity.plan !== 'string') {
     data.identity.plan = 'standard';
   }
 
+  const legacyLanguages = Array.isArray(data.identity.languages) ? data.identity.languages : [];
+  const schemaLanguages = Array.isArray(data.languages.active) ? data.languages.active : [];
+  const normalizedLanguages = schemaLanguages.length ? schemaLanguages : legacyLanguages;
+
+  data.languages.active = normalizedLanguages;
+  data.identity.languages = [...normalizedLanguages];
+
+  const legacyStatus = typeof data.identity.status === 'string' ? data.identity.status : '';
+  const schemaStatus =
+    typeof data.status.lifecycle === 'string' && data.status.lifecycle.trim()
+      ? data.status.lifecycle.trim()
+      : '';
+
+  const normalizedStatus = schemaStatus || legacyStatus || 'active';
+
+  data.status.lifecycle = normalizedStatus;
+  data.identity.status = normalizedStatus;
+
   if (typeof data.links.publicPage !== 'string') {
-    data.links.publicPage = '';
+    data.links.publicPage =
+      typeof data.links.clientMenuUrl === 'string'
+        ? data.links.clientMenuUrl
+        : '';
   }
 
   if (typeof data.billing.planPrice !== 'number') {
@@ -947,32 +968,21 @@ function addCategory() {
     currentRestaurantData.menu.categories = [];
   }
 
-  const canonicalCategories = [
-    { id: 'snacks', name: 'Snacks' },
-    { id: 'entrees', name: 'Entrées' },
-    { id: 'plats', name: 'Plats' },
-    { id: 'moules', name: 'Moules' },
-    { id: 'desserts', name: 'Desserts' },
-    { id: 'crepes', name: 'Crêpes' },
-    { id: 'suggestions', name: 'Suggestions' },
-    { id: 'supplements', name: 'Suppléments' },
-    { id: 'boissons', name: 'Boissons' }
-  ];
-
   const existingIds = new Set(
     currentRestaurantData.menu.categories.map((category) => category.id)
   );
 
-  const nextCategory = canonicalCategories.find((category) => !existingIds.has(category.id));
+  let categoryIndex = 1;
+  let categoryId = `categorie-${categoryIndex}`;
 
-  if (!nextCategory) {
-    alert('Toutes les catégories standard compatibles sont déjà créées.');
-    return;
+  while (existingIds.has(categoryId)) {
+    categoryIndex += 1;
+    categoryId = `categorie-${categoryIndex}`;
   }
 
   currentRestaurantData.menu.categories.unshift({
-    id: nextCategory.id,
-    name: nextCategory.name,
+    id: categoryId,
+    name: 'Nouvelle catégorie',
     order: 1,
     visible: true,
     items: []
@@ -1199,7 +1209,14 @@ function bindFormEvents() {
 
   document.getElementById('field-status').addEventListener('change', (e) => {
     if (!currentRestaurantData) return;
-    currentRestaurantData.identity.status = e.target.value;
+
+    if (!currentRestaurantData.status || typeof currentRestaurantData.status !== 'object') {
+      currentRestaurantData.status = {};
+    }
+
+    const statusValue = e.target.value;
+    currentRestaurantData.status.lifecycle = statusValue;
+    currentRestaurantData.identity.status = statusValue;
     markDirty();
   });
 
@@ -1210,13 +1227,20 @@ function bindFormEvents() {
     markDirty();
   });
 
-   document.getElementById('field-languages').addEventListener('input', (e) => {
+  document.getElementById('field-languages').addEventListener('input', (e) => {
     if (!currentRestaurantData) return;
 
-    currentRestaurantData.identity.languages = e.target.value
+    if (!currentRestaurantData.languages || typeof currentRestaurantData.languages !== 'object') {
+      currentRestaurantData.languages = {};
+    }
+
+    const normalizedLanguages = e.target.value
       .split(',')
       .map(item => item.trim())
       .filter(Boolean);
+
+    currentRestaurantData.languages.active = normalizedLanguages;
+    currentRestaurantData.identity.languages = [...normalizedLanguages];
 
     recalculateBilling();
     document.getElementById('billing-options-price').textContent =
